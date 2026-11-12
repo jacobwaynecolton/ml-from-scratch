@@ -22,3 +22,4 @@ Tasks 1-6 and 8 follow the CSC2516 syllabus - each gets built the week its topic
 Practice outside the task list.
 
 - [extras/sampling/top_k_sampling.py](extras/sampling/top_k_sampling.py): top-k logit filtering, three ways (threshold mask, sort + index, topk + scatter)
+- [extras/gather/gather_exercises.py](extras/gather/gather_exercises.py): `torch.gather` drills: sort/unsort with gather + scatter, target log-probs (checked against `F.cross_entropy`), masked sequence mean log-prob, last real hidden state per sequence
