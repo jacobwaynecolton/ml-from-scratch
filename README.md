@@ -16,3 +16,9 @@ From-scratch reimplementations for CSC2516 (Neural Networks and Deep Learning), 
 | 10 | LoRA | <1% params trainable, beats frozen baseline | [ ] |
 
 Tasks 1-6 and 8 follow the CSC2516 syllabus - each gets built the week its topic is lectured. Task 1 follows the micrograd approach. Tasks 7, 9, and 10 aren't covered in the course, doing them anyway.
+
+## Extras
+
+Practice outside the task list.
+
+- [extras/sampling/top_k_sampling.py](extras/sampling/top_k_sampling.py): top-k logit filtering, three ways (threshold mask, sort + index, topk + scatter)
