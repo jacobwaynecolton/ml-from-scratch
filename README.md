@@ -23,4 +23,5 @@ Practice outside the task list.
 
 - [extras/sampling/top_k_sampling.py](extras/sampling/top_k_sampling.py): top-k logit filtering, three ways (threshold mask, sort + index, topk + scatter)
 - [extras/sampling/top_p_sampling.py](extras/sampling/top_p_sampling.py): top-p (nucleus) sampling: sort, cumsum mask, renormalize, sample, map back to vocab ids with `gather`
+- [extras/sampling/beam_search.py](extras/sampling/beam_search.py): batched beam search over a toy bigram log-prob table: add beam scores, flatten, `topk`, recover parent beam (`// V`) and token (`% V`); greedy decoding as a baseline, checked equal to beam width 1 for every start token
 - [extras/gather/gather_exercises.py](extras/gather/gather_exercises.py): `torch.gather` drills: sort/unsort with gather + scatter, target log-probs (checked against `F.cross_entropy`), masked sequence mean log-prob, last real hidden state per sequence
