@@ -1,30 +1,30 @@
 # ml-from-scratch
 
-From-scratch reimplementations for CSC2516 (Neural Networks and Deep Learning), MScAC @ UofT.
+PyTorch building blocks for transformer inference, written from raw tensor ops and checked against PyTorch's own implementations or brute-force references.
 
-| # | Task | Pass criterion | Done |
-|---|------|----------------|------|
-| 1 | Autograd engine | Gradients match torch.autograd to 1e-6 on a 3-layer net | [ ] |
-| 2 | Linear + logistic regression, hand-written SGD/momentum/Adam | My Adam matches torch.optim.Adam step-for-step to 1e-6 | [ ] |
-| 3 | MLP on MNIST (hand-written SGD) | >97% test accuracy, no nn.Module, no optimizer | [ ] |
-| 4 | LayerNorm + BatchNorm (fwd + bwd) | Outputs and grads match torch to 1e-5 | [ ] |
-| 5 | CNN + residual block | Forward and backward match torch to 1e-5 | [ ] |
-| 6 | RNN/LSTM char-level model | Generates plausible text; grads match torch to 1e-5 | [ ] |
-| 7 | BPE tokenizer | encode/decode matches tiktoken GPT-2 byte-for-byte | [ ] |
-| 8 | GPT-2 (load real 124M weights) | Logits match HuggingFace to 1e-4 | [ ] |
-| 9 | KV cache | Identical output to uncached, >4x faster | [ ] |
-| 10 | LoRA | <1% params trainable, beats frozen baseline | [ ] |
+Each file is a self-contained exercise: the implementation comes first, then an `if __name__ == "__main__":` block with assert-based tests. Most began as Colab notebooks and were exported to `.py`.
 
-Tasks 1-6 and 8 follow the CSC2516 syllabus - each gets built the week its topic is lectured. Task 1 follows the micrograd approach. Tasks 7, 9, and 10 aren't covered in the course, doing them anyway.
+## Running
 
-## Extras
+```bash
+pip install torch
+python decoding/beam_search.py   # any file; silent exit = all asserts passed
+```
 
-Practice outside the task list.
+## Contents
 
-- [extras/sampling/top_k_sampling.py](extras/sampling/top_k_sampling.py): top-k logit filtering, three ways (threshold mask, sort + index, topk + scatter)
-- [extras/sampling/top_p_sampling.py](extras/sampling/top_p_sampling.py): top-p (nucleus) sampling: sort, cumsum mask, renormalize, sample, map back to vocab ids with `gather`
-- [extras/sampling/beam_search.py](extras/sampling/beam_search.py): batched beam search over a toy bigram log-prob table: add beam scores, flatten, `topk`, recover parent beam (`// V`) and token (`% V`); greedy decoding as a baseline, checked equal to beam width 1 for every start token
-- [extras/sampling/beam_search_drills.py](extras/sampling/beam_search_drills.py): beam search building blocks as separate drills: one batched next-token lookup, top-k over flattened beam scores, extending winning beams with `cat`, a clamped `topk`, and reordering per-beam state (a KV cache stand-in) by parent index; checked against a brute-force scan
-- [extras/gather/gather_exercises.py](extras/gather/gather_exercises.py): `torch.gather` drills: sort/unsort with gather + scatter, target log-probs (checked against `F.cross_entropy`), masked sequence mean log-prob, last real hidden state per sequence
-- [extras/attention/attention_pool.py](extras/attention/attention_pool.py): masked attention pooling over a padded batch: score tokens against a learned query, mask padding to `-inf`, softmax, weighted sum to `(B, D)`; tested for exact zero weight on padding, invariance to padded contents, the single-real-token case, and finite grads, plus an all-padding-row experiment
-- [extras/attention/multi_head_causal_self_attention.py](extras/attention/multi_head_causal_self_attention.py): multi-head causal self-attention as an `nn.Module`: Q/K/V projections, split into heads with `view` + `transpose`, scaled dot products, `triu` causal mask, softmax, merge heads, output projection; tested for shape, causality (future tokens can't change past outputs), parameter count, and an exact match against `nn.MultiheadAttention` loaded with the same weights
+### Tensor ops — [`tensor-ops/`](tensor-ops)
+
+- [`gather_exercises.py`](tensor-ops/gather_exercises.py): `torch.gather` drills: sort/unsort with gather + scatter, target log-probs (checked against `F.cross_entropy`), masked sequence mean log-prob, last real hidden state per sequence
+
+### Decoding — [`decoding/`](decoding)
+
+- [`top_k_sampling.py`](decoding/top_k_sampling.py): top-k logit filtering, three ways (threshold mask, sort + index, topk + scatter)
+- [`top_p_sampling.py`](decoding/top_p_sampling.py): top-p (nucleus) sampling: sort, cumsum mask, renormalize, sample, map back to vocab ids with `gather`
+- [`beam_search.py`](decoding/beam_search.py): batched beam search over a toy bigram log-prob table: add beam scores, flatten, `topk`, recover parent beam (`// V`) and token (`% V`); greedy decoding as a baseline, checked equal to beam width 1 for every start token
+- [`beam_search_drills.py`](decoding/beam_search_drills.py): beam search building blocks as separate drills: one batched next-token lookup, top-k over flattened beam scores, extending winning beams with `cat`, a clamped `topk`, and reordering per-beam state (a KV cache stand-in) by parent index; checked against a brute-force scan
+
+### Attention — [`attention/`](attention)
+
+- [`attention_pool.py`](attention/attention_pool.py): masked attention pooling over a padded batch: score tokens against a learned query, mask padding to `-inf`, softmax, weighted sum to `(B, D)`; tested for exact zero weight on padding, invariance to padded contents, the single-real-token case, and finite grads, plus an all-padding-row experiment
+- [`multi_head_causal_self_attention.py`](attention/multi_head_causal_self_attention.py): multi-head causal self-attention as an `nn.Module`: Q/K/V projections, split into heads with `view` + `transpose`, scaled dot products, `triu` causal mask, softmax, merge heads, output projection; tested for shape, causality (future tokens can't change past outputs), parameter count, and an exact match against `nn.MultiheadAttention` loaded with the same weights
