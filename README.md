@@ -2,7 +2,7 @@
 
 PyTorch building blocks for transformer inference, written from raw tensor ops and checked against PyTorch's own implementations or brute-force references.
 
-Each file is a self-contained exercise: the implementation comes first, then an `if __name__ == "__main__":` block with assert-based tests. Most began as Colab notebooks and were exported to `.py`.
+Each file is a self-contained exercise (except in [`bug-hunts/`](bug-hunts), see below): the implementation comes first, then an `if __name__ == "__main__":` block with assert-based tests. Most began as Colab notebooks and were exported to `.py`.
 
 ## Running
 
@@ -28,3 +28,10 @@ python decoding/beam_search.py   # any file; silent exit = all asserts passed
 
 - [`attention_pool.py`](attention/attention_pool.py): masked attention pooling over a padded batch: score tokens against a learned query, mask padding to `-inf`, softmax, weighted sum to `(B, D)`; tested for exact zero weight on padding, invariance to padded contents, the single-real-token case, and finite grads, plus an all-padding-row experiment
 - [`multi_head_causal_self_attention.py`](attention/multi_head_causal_self_attention.py): multi-head causal self-attention as an `nn.Module`: Q/K/V projections, split into heads with `view` + `transpose`, scaled dot products, `triu` causal mask, softmax, merge heads, output projection; tested for shape, causality (future tokens can't change past outputs), parameter count, and an exact match against `nn.MultiheadAttention` loaded with the same weights
+
+### Bug hunts — [`bug-hunts/`](bug-hunts)
+
+> **Intentionally buggy code.** These are debugging exercises, kept as given (unsolved). The bugs are planted on purpose; they are not mistakes in my implementations. See [`bug-hunts/README.md`](bug-hunts/README.md).
+
+- [`mlp_training_loop.py`](bug-hunts/mlp_training_loop.py): MLP classifier training and evaluation with planted bugs
+- [`masked_multi_head_attention.py`](bug-hunts/masked_multi_head_attention.py): masked multi-head self-attention with planted bugs
